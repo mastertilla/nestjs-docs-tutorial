@@ -1,20 +1,31 @@
 import { Module } from '@nestjs/common';
 import { PostsModule } from './posts/posts.module';
-import { ConfigModule } from '@nestjs/config';
-import * as Joi from '@hapi/joi';
-import { DatabaseModule } from './database/database.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { readFileSync } from 'fs';
 
 @Module({
-  imports: [PostsModule,
-    ConfigModule.forRoot({
-        validationSchema: Joi.object({
-            POSTGRES_URL: Joi.string().required(),
-            POSTGRES_DB: Joi.string().required(),
-            PORT: Joi.number()
-        })
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }), // Load .env file and make it globally available
+    PostsModule,
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USERNAME'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_NAME'),
+        autoLoadEntities: true,
+        synchronize: true,
+        ssl: {
+            rejectUnauthorized: true,
+            ca: readFileSync(configService.get<string>('DB_SSL_CA')).toString(),
+        }
+      }),
     }),
-  DatabaseModule,
-],
+  ],
   controllers: [],
   providers: [],
 })
