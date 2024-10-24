@@ -10,6 +10,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         url: configService.get('POSTGRES_URL'),
+        ssl: {
+            rejectUnauthorized: false, // Ignore SSL errors (not recommended for production)
+          },
         entities: [
           __dirname + '/../**/*.entity.ts',
         ],
