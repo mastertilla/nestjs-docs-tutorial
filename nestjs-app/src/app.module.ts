@@ -5,13 +5,14 @@ import * as Joi from '@hapi/joi';
 import { DatabaseModule } from './database/database.module';
 
 @Module({
-  imports: [PostsModule, ConfigModule.forRoot({
-    validationSchema: Joi.object({
-        POSTGRES_URL: Joi.string().required(),
-        POSTGRES_DB: Joi.string().required(),
-        PORT: Joi.number()
-    })
-  }),
+  imports: [PostsModule,
+    ConfigModule.forRoot({
+        validationSchema: Joi.object({
+            POSTGRES_URL: Joi.string().required(),
+            POSTGRES_DB: Joi.string().required(),
+            PORT: Joi.number()
+        })
+    }),
   DatabaseModule,
 ],
   controllers: [],
