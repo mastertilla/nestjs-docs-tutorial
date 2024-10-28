@@ -1,7 +1,7 @@
 import {Body, Controller, Delete, Get, Param, Post, Put} from '@nestjs/common';
 import PostsService from './posts.service';
-import { CreatePostDto } from './dto/createPost.dto';
-import { UpdatePostDto } from './dto/updatePost.dto';
+import CreatePostDto from './dto/createPost.dto';
+import UpdatePostDto from './dto/updatePost.dto';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Posts')

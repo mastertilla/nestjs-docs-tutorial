@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { readFileSync } from 'fs';
 
 @Module({
   imports: [
@@ -9,15 +10,18 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
-        url: configService.get('POSTGRES_URL'),
-        ssl: {
-            rejectUnauthorized: false, // Ignore SSL errors (not recommended for production)
-          },
-        entities: [
-          __dirname + '/../**/*.entity.ts',
-        ],
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USERNAME'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_NAME'),
+        autoLoadEntities: true,
         synchronize: true,
-      })
+        ssl: {
+            rejectUnauthorized: true,
+            ca: readFileSync(configService.get<string>('DB_SSL_CA')).toString(),
+        }
+      }),
     }),
   ],
 })
