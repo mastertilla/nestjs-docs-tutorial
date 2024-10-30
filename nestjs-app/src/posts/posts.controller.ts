@@ -1,12 +1,14 @@
-import {Body, Controller, Delete, Get, Param, Post, Put, UseGuards} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards, UseInterceptors, ClassSerializerInterceptor} from '@nestjs/common';
 import PostsService from './posts.service';
 import CreatePostDto from './dto/createPost.dto';
 import UpdatePostDto from './dto/updatePost.dto';
 import { ApiTags } from '@nestjs/swagger';
 import JwtAuthenticationGuard from 'src/authentication/jwt-authentication.guard';
+import RequestWithUser from 'src/authentication/requestWithUser.interface';
 
 @ApiTags('Posts')
 @Controller('posts')
+@UseInterceptors(ClassSerializerInterceptor)
 export default class PostsController {
     constructor(
         private readonly postsService: PostsService
@@ -24,8 +26,8 @@ export default class PostsController {
 
     @Post()
     @UseGuards(JwtAuthenticationGuard)
-    async createPost(@Body() post: CreatePostDto) {
-        return this.postsService.createPost(post);
+    async createPost(@Body() post: CreatePostDto, @Req() req: RequestWithUser) {
+        return this.postsService.createPost(post, req.user);
     }
 
     @Put(':id')
